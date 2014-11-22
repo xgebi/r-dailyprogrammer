@@ -72,7 +72,7 @@
 						die("Wrong word list");
 				}
 				$handle = fopen("temp", "w");
-				fwrite($handle, $chosen);
+				fwrite($handle, strtolower($chosen));
 				fclose($handle);			
 				printStuff();
 			endif;
@@ -81,13 +81,15 @@
 		<?php	
 		endif;
 	elseif (isset($_GET["letter"])) :
-		printStuff();
+		//print_r($_POST);
+		printStuff($_POST["letter"]);
 	else : ?>
 		Please, <a href="hangman.php">try again</a>
 	<?php	
 	endif;
 	
 	function printStuff($letter = "") {
+		//echo $letter;
 		$handle = fopen("temp", "r");
 		$data = [];
 		$i = 0;
@@ -101,15 +103,45 @@
 			}
 			fclose($handle);
 		} 
+		if ($data[LETTERS] == null)
+				$data[LETTERS] = "letters=";
+		if ($data[ERRORS] == null)
+				$data[ERRORS] = "errors=0";
+		$data[WORD] = substr($data[WORD], 0, strlen($data[WORD])-1);
 		if(strlen($letter) == 1) {
-			if (strpos($data[0], $letter))
-				$data[LETTERS] .= ",".$letter;
+			if (strpos($data[WORD], $letter) >=0) {				
+				$data[LETTERS] =trim($data[LETTERS]).trim($letter);
+			} else {
+				$err = substr($data[ERRORS], strpos($data[ERRORS], "=")+1);
+				$err++;
+				$data[ERRORS] = "errors=".trim($err);
+			}
+				
 		}
+		$handle = fopen("temp", "w");
+		fwrite($handle, trim($data[WORD])."\n".trim($data[LETTERS])."\n".trim($data[ERRORS]));
+		fclose($handle);
+		
 		$toPrint;
 		if ((strpos($data[LETTERS], "=") == (strlen($data[LETTERS])-1)) || ($data[LETTERS] == null)) {
+			//echo "problem";
 			for ($i = 0; $i < strlen($data[WORD]); $i++) {
 				$toPrint .= "_ ";
 			}
+		} else {
+			//echo "better";
+			$letters = substr($data[LETTERS], strpos($data[LETTERS], "=")+1 );		
+			$tempToPrint = [];
+			for ($i = 0; $i < strlen($data[WORD]); $i++) {
+				$tempToPrint[$i] = "_";
+				for ($j = 0; $j < strlen($letters); $j++) {
+					if ($data[WORD][$i] == $letters[$j]) {
+						$tempToPrint[$i] = $letters[$j];
+						break;
+					}
+				}				
+			}
+			$toPrint = implode(" ", $tempToPrint);
 		}
 		//print graphics here
 		echo $toPrint;
