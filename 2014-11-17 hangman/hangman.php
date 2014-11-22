@@ -67,7 +67,9 @@
 				if ($startedAgain && ($i == $start))
 					die("Wrong word list");
 			}
-						
+			$handle = fopen("temp", "w");
+			fwrite($handle, $chosen);
+			fclose($handle);			
 			endif;
 		else :?>
 		Please, <a href="hangman.php">try again</a>
@@ -80,7 +82,23 @@
 	<?php	
 	endif;
 	
-	function printStuff()
+	function printStuff($letter = "") {
+		$handle = fopen("temp", "r");
+		$data = [];
+		$i = 0;
+		if ($handle) {
+			while (($buffer = fgets($handle, 4096)) !== false) {
+				$data[$i] = $buffer;
+				$i++;
+			}
+			if (!feof($handle)) {
+			    echo "Error: unexpected fgets() fail\n";
+			}
+			fclose($handle);
+		}
+		//print graphics here
+		
+	}
 ?>
 	</body>
 </html>
