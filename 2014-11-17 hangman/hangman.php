@@ -108,11 +108,13 @@
 		if ($data[ERRORS] == null)
 				$data[ERRORS] = "errors=0";
 		$data[WORD] = substr($data[WORD], 0, strlen($data[WORD])-1);
+		$err = substr($data[ERRORS], strpos($data[ERRORS], "=")+1);
+		if ($err == "")
+			$err = 0;
 		if(strlen($letter) == 1) {
-			if (strpos($data[WORD], $letter) >=0) {				
+			if (strpos($data[WORD], $letter) !== false) {			
 				$data[LETTERS] =trim($data[LETTERS]).trim($letter);
-			} else {
-				$err = substr($data[ERRORS], strpos($data[ERRORS], "=")+1);
+			} else {				
 				$err++;
 				$data[ERRORS] = "errors=".trim($err);
 			}
@@ -143,14 +145,123 @@
 			}
 			$toPrint = implode(" ", $tempToPrint);
 		}
-		//print graphics here
+		drawHangman($err);
 		echo $toPrint;
+		if (strpos($toPrint, "_") === false) :
+			echo "<br>You've won! <a href=\"hangman.php\">Try again</a>";
+		elseif ($err < 12) :
 		?>
 			<form action="hangman.php?letter" method="post">
 				<input type="text" name="letter" />
 				<input type="submit" value="Try letter" />
 			</form>
 		<?php
+		else :?>
+		Please, <a href="hangman.php">try again</a>
+		<?php
+		endif;
+	}
+	function drawHangman($steps) {
+		echo "<pre>";
+		switch ($steps) {		
+		case 1: echo "
+	  
+	      
+	        
+	     
+	       
+	_______________";
+break;
+		case 2:echo "
+	  
+	      
+	        
+	  |     
+	  |     
+	_______________";
+break;
+			case 3:echo "
+	  
+	  |    
+	  |      
+	  |     
+	  |     
+	_______________";
+break;
+			case 4:echo "
+	  ________
+	  |    
+	  |      
+	  |     
+	  |     
+	_______________";
+break;
+			case 5: echo "
+	  ________
+	  |/     
+	  |      
+	  |     
+	  |     
+	_______________";
+break;
+			case 6: echo "
+	  ________
+	  |/     |
+	  |      
+	  |     
+	  |     
+	_______________";
+break;
+			case 7: echo "
+	  ________
+	  |/     |
+	  |      O
+	  |     
+	  |      
+	_______________";
+break;
+			case 8: echo "
+	  ________
+	  |/     |
+	  |      O
+	  |      |
+	  |     
+	_______________";
+break;
+			case 9: echo "
+	  ________
+	  |/     |
+	  |      O
+	  |     /|
+	  |     
+	_______________";
+break;
+			case 10: echo "
+	  ________
+	  |/     |
+	  |      O
+	  |     /|\
+	  |     
+	_______________";
+break;
+			case 11:echo "
+	  ________
+	  |/     |
+	  |      O
+	  |     /|\
+	  |     / 
+	_______________";
+break;
+			case 12: echo "
+	  ________
+	  |/     |
+	  |      O
+	  |     /|\
+	  |     / \
+	_______________";
+break;
+		}
+		echo "</pre>";
 	}
 ?>
 	</body>
